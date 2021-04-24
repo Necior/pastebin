@@ -65,5 +65,9 @@ async fn main() {
 
     let routing = new_paste.or(get);
 
-    warp::serve(routing).run(([127, 0, 0, 1], 3030)).await;
+    let port = std::env::var("PASTEBIN_PORT")
+        .ok()
+        .and_then(|e| e.parse().ok())
+        .unwrap_or(3030);
+    warp::serve(routing).run(([127, 0, 0, 1], port)).await;
 }
