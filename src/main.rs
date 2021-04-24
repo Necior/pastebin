@@ -34,7 +34,7 @@ async fn main() {
     let repo = Arc::new(Mutex::new(MemoryRepository::new()));
 
     let local_repo = repo.clone();
-    let new_paste = warp::path!("new")
+    let new_paste = warp::path::end()
         .and(warp::post())
         .and(warp::body::bytes())
         .map(move |bytes: warp::hyper::body::Bytes| {
