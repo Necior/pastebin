@@ -38,6 +38,7 @@ async fn main() {
         .and(warp::post())
         .and(warp::body::bytes())
         .map(move |bytes: warp::hyper::body::Bytes| {
+            // TODO: limit upload size
             let text: Vec<_> = bytes.to_vec();
             let text = String::from_utf8(text);
             match text {
