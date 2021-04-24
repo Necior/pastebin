@@ -53,7 +53,7 @@ async fn main() {
         });
 
     let local_repo = repo.clone();
-    let get = warp::path!("g" / Uuid).and(warp::get()).map(move |id| {
+    let get = warp::path!(Uuid).and(warp::get()).map(move |id| {
         let repo = local_repo.lock().unwrap();
         let paste = repo.get_paste(id);
         match paste {
