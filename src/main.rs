@@ -32,13 +32,13 @@ impl MemoryRepository {
 async fn main() {
     let repo = Arc::new(Mutex::new(MemoryRepository::new()));
 
-    let r1 = repo.clone();
+    let local_repo = repo.clone();
     let new_paste = warp::path!("new" / String)
-        .map(move |text| format!("{}", r1.lock().unwrap().new_paste(text)));
+        .map(move |text| format!("{}", local_repo.lock().unwrap().new_paste(text)));
 
-    let r2 = repo.clone();
+    let local_repo = repo.clone();
     let get = warp::path!("g" / Uuid).map(move |id| {
-        let repo = r2.lock().unwrap();
+        let repo = local_repo.lock().unwrap();
         let paste = repo.get_paste(id);
         match paste {
             Some(p) => p.to_string(),
