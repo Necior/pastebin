@@ -10,3 +10,15 @@ Currently in a very early development stage.
 - Easy data removal (just restart the app!);
 - Increases your server Cool-factor (since it's written in Rust).
 
+## Usage
+
+```sh
+# To upload some UTF-8 text, POST to `/`:
+$ curl http://localhost:3030/ --data 'Lorem ipsum dolor sit amet'
+2ba728dc-6a7c-49fe-97f5-34b52210a5c4
+
+# To download, GET `/<UUID>`:
+$ curl http://localhost:3030/2ba728dc-6a7c-49fe-97f5-34b52210a5c4
+Lorem ipsum dolor sit amet
+```
+
