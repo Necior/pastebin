@@ -2,7 +2,8 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
 use uuid::Uuid;
-use warp::Filter;
+use warp::http::StatusCode;
+use warp::{reply::with_status, Filter};
 
 struct MemoryRepository {
     map: HashMap<Uuid, String>,
@@ -40,8 +41,14 @@ async fn main() {
             let text: Vec<_> = bytes.to_vec();
             let text = String::from_utf8(text);
             match text {
-                Ok(t) => format!("{}", local_repo.lock().unwrap().new_paste(t)),
-                Err(_) => "Text is not a valid UTF-8".to_string(),
+                Ok(t) => with_status(
+                    format!("{}", local_repo.lock().unwrap().new_paste(t)),
+                    StatusCode::CREATED,
+                ),
+                Err(_) => with_status(
+                    "Text is not a valid UTF-8".to_string(),
+                    StatusCode::BAD_REQUEST,
+                ),
             }
         });
 
@@ -50,8 +57,8 @@ async fn main() {
         let repo = local_repo.lock().unwrap();
         let paste = repo.get_paste(id);
         match paste {
-            Some(p) => p.to_string(),
-            None => "Not found".to_string(), // TODO: use 404 status code
+            Some(p) => with_status(p.to_string(), StatusCode::OK),
+            None => with_status("Not found".to_string(), StatusCode::NOT_FOUND),
         }
     });
 
