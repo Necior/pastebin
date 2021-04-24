@@ -46,7 +46,7 @@ async fn main() {
         }
     });
 
-    warp::serve(warp::get().and(new_paste).or(get))
-        .run(([127, 0, 0, 1], 3030))
-        .await;
+    let routing = warp::get().and(new_paste).or(get);
+
+    warp::serve(routing).run(([127, 0, 0, 1], 3030)).await;
 }
