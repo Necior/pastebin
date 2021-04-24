@@ -33,11 +33,20 @@ async fn main() {
     let repo = Arc::new(Mutex::new(MemoryRepository::new()));
 
     let local_repo = repo.clone();
-    let new_paste = warp::path!("new" / String)
-        .map(move |text| format!("{}", local_repo.lock().unwrap().new_paste(text)));
+    let new_paste = warp::path!("new")
+        .and(warp::post())
+        .and(warp::body::bytes())
+        .map(move |bytes: warp::hyper::body::Bytes| {
+            let text: Vec<_> = bytes.to_vec();
+            let text = String::from_utf8(text);
+            match text {
+                Ok(t) => format!("{}", local_repo.lock().unwrap().new_paste(t)),
+                Err(_) => "Text is not a valid UTF-8".to_string(),
+            }
+        });
 
     let local_repo = repo.clone();
-    let get = warp::path!("g" / Uuid).map(move |id| {
+    let get = warp::path!("g" / Uuid).and(warp::get()).map(move |id| {
         let repo = local_repo.lock().unwrap();
         let paste = repo.get_paste(id);
         match paste {
@@ -46,7 +55,7 @@ async fn main() {
         }
     });
 
-    let routing = warp::get().and(new_paste).or(get);
+    let routing = new_paste.or(get);
 
     warp::serve(routing).run(([127, 0, 0, 1], 3030)).await;
 }
