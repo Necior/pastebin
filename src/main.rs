@@ -5,6 +5,11 @@ use uuid::Uuid;
 use warp::http::StatusCode;
 use warp::{reply::with_status, Filter};
 
+trait Repository {
+    fn new_paste(&mut self, text: String) -> Uuid;
+    fn get_paste(&self, id: Uuid) -> Option<&String>;
+}
+
 struct MemoryRepository {
     map: HashMap<Uuid, String>,
 }
@@ -17,7 +22,7 @@ impl MemoryRepository {
     }
 }
 
-impl MemoryRepository {
+impl Repository for MemoryRepository {
     fn new_paste(&mut self, text: String) -> Uuid {
         let id = Uuid::new_v4();
         self.map.insert(id, text);
@@ -31,7 +36,7 @@ impl MemoryRepository {
 
 #[tokio::main]
 async fn main() {
-    let repo = Arc::new(Mutex::new(MemoryRepository::new()));
+    let repo: Arc<Mutex<dyn Repository + Send>> = Arc::new(Mutex::new(MemoryRepository::new()));
 
     let local_repo = repo.clone();
     let new_paste = warp::path::end()
