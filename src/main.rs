@@ -74,5 +74,9 @@ async fn main() {
         .ok()
         .and_then(|e| e.parse().ok())
         .unwrap_or(2137);
-    warp::serve(routing).run(([127, 0, 0, 1], port)).await;
+    let host = std::env::var("PASTEBIN_HOST")
+        .ok()
+        .and_then(|e| e.parse().ok())
+        .unwrap_or(std::net::Ipv4Addr::new(127, 0, 0, 1));
+    warp::serve(routing).run((host, port)).await;
 }
