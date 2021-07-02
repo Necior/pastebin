@@ -68,7 +68,9 @@ async fn main() {
         }
     });
 
-    let routing = new_paste.or(get);
+    let home = warp::path::end().map(|| "");
+
+    let routing = home.or(new_paste).or(get);
 
     let port = std::env::var("PASTEBIN_PORT")
         .ok()
