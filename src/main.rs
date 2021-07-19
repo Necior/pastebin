@@ -68,7 +68,7 @@ async fn main() {
         }
     });
 
-    let home = warp::path::end().map(|| "");
+    let home = warp::path::end().and(warp::get()).map(|| "");
 
     let routing = home.or(new_paste).or(get);
 
